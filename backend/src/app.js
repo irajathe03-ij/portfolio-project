@@ -1,9 +1,10 @@
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const express = require("express");
-app.set("trust proxy", 1);
 const cors = require("cors");
+
 require("dotenv").config();
+
 const aboutRoutes = require("./routes/aboutRoutes");
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -18,6 +19,8 @@ const mediaRoutes = require("./routes/mediaRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 
 const app = express();
+
+app.set("trust proxy", 1);
 
 app.use(helmet());
 
@@ -34,7 +37,7 @@ const apiLimiter = rateLimit({
 
 app.use("/api", apiLimiter);
 
-// Middleware
+// CORS
 app.use(
     cors({
         origin: [
