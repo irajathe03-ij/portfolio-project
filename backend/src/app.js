@@ -37,9 +37,11 @@ app.use("/api", apiLimiter);
 app.use(
     cors({
         origin: [
+            "http://localhost:5173",
+            "http://localhost:5174",
             process.env.FRONTEND_URL,
             process.env.ADMIN_URL
-        ],
+        ].filter(Boolean),
         credentials: true
     })
 );
