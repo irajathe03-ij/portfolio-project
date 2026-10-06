@@ -11,24 +11,9 @@ import Services from "./pages/Services";
 import Testimonials from "./pages/Testimonials";
 import Media from "./pages/Media";
 import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
 
 import AdminLayout from "./layouts/AdminLayout";
-
-function Placeholder({ title }) {
-    return (
-        <div>
-            <h2 className="text-3xl font-bold text-slate-800">
-                {title}
-            </h2>
-
-            <div className="mt-6 rounded-xl bg-white p-8 shadow-sm">
-                <p className="text-slate-600">
-                    {title} management will be available here.
-                </p>
-            </div>
-        </div>
-    );
-}
 
 function App() {
     return (
@@ -89,10 +74,14 @@ function App() {
                         element={<Media />}
                     />
 
-                    {/* Messages will be added next */}
                     <Route
-                         path="/messages"
-                         element={<Messages />}
+                        path="/messages"
+                        element={<Messages />}
+                    />
+
+                    <Route
+                        path="/settings"
+                        element={<Settings />}
                     />
 
                 </Route>

@@ -15,7 +15,8 @@ function AdminLayout() {
         { name: "Services", path: "/services" },
         { name: "Testimonials", path: "/testimonials" },
         { name: "Media", path: "/media" },
-        { name: "Messages", path: "/messages" }
+        { name: "Messages", path: "/messages" },
+        { name: "Settings", path: "/settings" }
     ];
 
     const handleLogout = () => {
