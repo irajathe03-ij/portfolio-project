@@ -1,137 +1,204 @@
 import { useEffect, useState } from "react";
 import api from "./services/api";
+
 function App() {
-const [about, setAbout] = useState(null);
-const [skills, setSkills] = useState([]);
-const [projects, setProjects] = useState([]);
-const [experience, setExperience] = useState([]);
-const [services, setServices] = useState([]);
-const [testimonials, setTestimonials] = useState([]);
-const [blogs, setBlogs] = useState([]);
-const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-});
+    const [about, setAbout] = useState(null);
+    const [skills, setSkills] = useState([]);
+    const [projects, setProjects] = useState([]);
 
-const [messageStatus, setMessageStatus] = useState("");
+    // Experience states
+    const [experience, setExperience] = useState([]);
+    const [experienceLoading, setExperienceLoading] = useState(true);
+    const [experienceError, setExperienceError] = useState("");
 
+    const [services, setServices] = useState([]);
+    const [testimonials, setTestimonials] = useState([]);
+    const [blogs, setBlogs] = useState([]);
+
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+    });
+
+    const [messageStatus, setMessageStatus] = useState("");
+
+    // =========================
+    // FETCH ABOUT
+    // =========================
     useEffect(() => {
-    const fetchAbout = async () => {
+        const fetchAbout = async () => {
+            try {
+                const response = await api.get("/about");
+                setAbout(response.data.data[0]);
+            } catch (error) {
+                console.error("Error fetching about:", error);
+            }
+        };
+
+        fetchAbout();
+    }, []);
+
+    // =========================
+    // FETCH SERVICES
+    // =========================
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await api.get("/services");
+                setServices(response.data.data);
+            } catch (error) {
+                console.error("Error fetching services:", error);
+            }
+        };
+
+        fetchServices();
+    }, []);
+
+    // =========================
+    // FETCH SKILLS
+    // =========================
+    useEffect(() => {
+        const fetchSkills = async () => {
+            try {
+                const response = await api.get("/skills");
+                setSkills(response.data.data);
+            } catch (error) {
+                console.error("Error fetching skills:", error);
+            }
+        };
+
+        fetchSkills();
+    }, []);
+
+    // =========================
+    // FETCH TESTIMONIALS
+    // =========================
+    useEffect(() => {
+        const fetchTestimonials = async () => {
+            try {
+                const response = await api.get("/testimonials");
+                setTestimonials(response.data.data);
+            } catch (error) {
+                console.error("Error fetching testimonials:", error);
+            }
+        };
+
+        fetchTestimonials();
+    }, []);
+
+    // =========================
+    // FETCH BLOGS
+    // =========================
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            try {
+                const response = await api.get("/blogs");
+                setBlogs(response.data.data);
+            } catch (error) {
+                console.error("Error fetching blogs:", error);
+            }
+        };
+
+        fetchBlogs();
+    }, []);
+
+    // =========================
+    // FETCH PROJECTS
+    // =========================
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await api.get("/projects");
+                setProjects(response.data.data);
+            } catch (error) {
+                console.error("Error fetching projects:", error);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    // =========================
+    // FETCH EXPERIENCE
+    // =========================
+    useEffect(() => {
+        const fetchExperience = async () => {
+            try {
+                setExperienceLoading(true);
+                setExperienceError("");
+
+                const response = await api.get("/experience");
+
+                console.log(
+                    "Experience API response:",
+                    response.data
+                );
+
+                if (
+                    response.data?.success &&
+                    Array.isArray(response.data.data)
+                ) {
+                    setExperience(response.data.data);
+                } else {
+                    setExperience([]);
+                    setExperienceError(
+                        "Unable to load experience data."
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "Error fetching experience:",
+                    error
+                );
+
+                setExperience([]);
+                setExperienceError(
+                    error.response?.data?.message ||
+                    error.message ||
+                    "Unable to load experience."
+                );
+            } finally {
+                setExperienceLoading(false);
+            }
+        };
+
+        fetchExperience();
+    }, []);
+
+    // =========================
+    // CONTACT FORM
+    // =========================
+    const handleContactSubmit = async (event) => {
+        event.preventDefault();
+
         try {
-            const response = await api.get("/about");
-            setAbout(response.data.data[0]);
+            await api.post("/messages", formData);
+
+            setMessageStatus(
+                "Message sent successfully! ❤️"
+            );
+
+            setFormData({
+                name: "",
+                email: "",
+                subject: "",
+                message: "",
+            });
         } catch (error) {
-            console.error("Error fetching about:", error);
+            console.error(
+                "Error sending message:",
+                error
+            );
+
+            setMessageStatus(
+                "Unable to send message. Please try again."
+            );
         }
     };
 
-    fetchAbout();
-}, []);
-
-useEffect(() => {
-    const fetchServices = async () => {
-        try {
-            const response = await api.get("/services");
-            setServices(response.data.data);
-        } catch (error) {
-            console.error("Error fetching services:", error);
-        }
-    };
-
-    fetchServices();
-}, []);
-
-useEffect(() => {
-    const fetchSkills = async () => {
-        try {
-            const response = await api.get("/skills");
-            setSkills(response.data.data);
-        } catch (error) {
-            console.error("Error fetching skills:", error);
-        }
-    };
-
-    fetchSkills();
-}, []);
-
-useEffect(() => {
-    const fetchTestimonials = async () => {
-        try {
-            const response = await api.get("/testimonials");
-            setTestimonials(response.data.data);
-        } catch (error) {
-            console.error("Error fetching testimonials:", error);
-        }
-    };
-
-    fetchTestimonials();
-}, []);
-
-useEffect(() => {
-    const fetchBlogs = async () => {
-        try {
-            const response = await api.get("/blogs");
-            setBlogs(response.data.data);
-        } catch (error) {
-            console.error("Error fetching blogs:", error);
-        }
-    };
-
-    fetchBlogs();
-}, []);
-
-useEffect(() => {
-    const fetchProjects = async () => {
-        try {
-            const response = await api.get("/projects");
-            setProjects(response.data.data);
-        } catch (error) {
-            console.error("Error fetching projects:", error);
-        }
-    };
-
-    fetchProjects();
-}, []);
-
-useEffect(() => {
-    const fetchExperience = async () => {
-        try {
-            const response = await api.get("/experience");
-            setExperience(response.data.data);
-        } catch (error) {
-            console.error("Error fetching experience:", error);
-        }
-    };
-
-    fetchExperience();
-}, []);
-
-const handleContactSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-        await api.post("/messages", formData);
-
-        setMessageStatus("Message sent successfully! ❤️");
-
-        setFormData({
-            name: "",
-            email: "",
-            subject: "",
-            message: "",
-        });
-    } catch (error) {
-        console.error("Error sending message:", error);
-
-        setMessageStatus(
-            "Unable to send message. Please try again."
-        );
-    }
-};
-
-return (
+    return (
         <div
             style={{
                 minHeight: "100vh",
@@ -139,7 +206,9 @@ return (
                     "linear-gradient(135deg, #fce7f3, #ede9fe, #dbeafe)",
             }}
         >
-            {/* Navbar */}
+            {/* =========================
+                NAVBAR
+            ========================= */}
             <nav
                 style={{
                     background: "rgba(255, 255, 255, 0.9)",
@@ -152,24 +221,41 @@ return (
                     zIndex: 10,
                 }}
             >
-                <h2 style={{ margin: 0, color: "#7c3aed" }}>
+                <h2
+                    style={{
+                        margin: 0,
+                        color: "#7c3aed",
+                    }}
+                >
                     Ira Jathe
                 </h2>
 
-                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                <div
+                    style={{
+                        display: "flex",
+                        gap: "20px",
+                        flexWrap: "wrap",
+                    }}
+                >
                     <a href="#home">Home</a>
                     <a href="#about">About</a>
                     <a href="#skills">Skills</a>
                     <a href="#projects">Projects</a>
-                    <a href="#experience">Experience</a>
+                    <a href="#experience">
+                        Experience
+                    </a>
                     <a href="#services">Services</a>
-                    <a href="#testimonials">Testimonials</a>
+                    <a href="#testimonials">
+                        Testimonials
+                    </a>
                     <a href="#blogs">Blogs</a>
                     <a href="#contact">Contact</a>
                 </div>
             </nav>
 
-            {/* Hero */}
+            {/* =========================
+                HERO
+            ========================= */}
             <section
                 id="home"
                 style={{
@@ -182,13 +268,20 @@ return (
                 }}
             >
                 <div>
-                    <p style={{ fontSize: "20px", color: "#7c3aed" }}>
+                    <p
+                        style={{
+                            fontSize: "20px",
+                            color: "#7c3aed",
+                        }}
+                    >
                         Hello, I'm
                     </p>
 
                     <h1
                         style={{
-                    fontSize: "clamp(40px, 10vw, 60px)",                            color: "#1e293b",
+                            fontSize:
+                                "clamp(40px, 10vw, 60px)",
+                            color: "#1e293b",
                             margin: "10px 0",
                         }}
                     >
@@ -196,13 +289,14 @@ return (
                     </h1>
 
                     <h2
-    style={{
-        fontSize: "clamp(22px, 6vw, 30px)",
-        color: "#7c3aed",
-    }}
->
-    Computer Science Engineer
-</h2>
+                        style={{
+                            fontSize:
+                                "clamp(22px, 6vw, 30px)",
+                            color: "#7c3aed",
+                        }}
+                    >
+                        Computer Science Engineer
+                    </h2>
 
                     <p
                         style={{
@@ -213,8 +307,9 @@ return (
                             lineHeight: "1.7",
                         }}
                     >
-                        I build modern web applications using React,
-                        Java, Spring Boot, Node.js, Express.js and MySQL.
+                        I build modern web applications using
+                        React, Java, Spring Boot, Node.js,
+                        Express.js and MySQL.
                     </p>
 
                     <div
@@ -226,7 +321,10 @@ return (
                             flexWrap: "wrap",
                         }}
                     >
-                        <a href="#projects" style={buttonStyle}>
+                        <a
+                            href="#projects"
+                            style={buttonStyle}
+                        >
                             View My Projects
                         </a>
 
@@ -236,31 +334,36 @@ return (
                                 ...buttonStyle,
                                 background: "white",
                                 color: "#7c3aed",
-                                border: "2px solid #7c3aed",
+                                border:
+                                    "2px solid #7c3aed",
                             }}
                         >
                             Contact Me
                         </a>
+
                         <a
-    href="/resume/Ira-Jathe-Resume.pdf"
-    download
-    style={{
-        ...buttonStyle,
-        background: "#dbeafe",
-        color: "#2563eb",
-    }}
->
-    Download CV
-</a>
+                            href="/resume/Ira-Jathe-Resume.pdf"
+                            download
+                            style={{
+                                ...buttonStyle,
+                                background: "#dbeafe",
+                                color: "#2563eb",
+                            }}
+                        >
+                            Download CV
+                        </a>
                     </div>
                 </div>
             </section>
 
-            {/* About */}
+            {/* =========================
+                ABOUT
+            ========================= */}
             <section
                 id="about"
                 style={{
-                    background: "rgba(255, 255, 255, 0.75)",
+                    background:
+                        "rgba(255, 255, 255, 0.75)",
                     padding: "80px 20px",
                 }}
             >
@@ -271,33 +374,37 @@ return (
                         textAlign: "center",
                     }}
                 >
-                    <h2 style={sectionTitleStyle}>About Me</h2>
+                    <h2 style={sectionTitleStyle}>
+                        About Me
+                    </h2>
 
                     {about ? (
-    <>
-        <h3
-            style={{
-                color: "#7c3aed",
-                fontSize: "26px",
-                marginBottom: "20px",
-            }}
-        >
-            {about.title}
-        </h3>
+                        <>
+                            <h3
+                                style={{
+                                    color: "#7c3aed",
+                                    fontSize: "26px",
+                                    marginBottom: "20px",
+                                }}
+                            >
+                                {about.title}
+                            </h3>
 
-        <p style={paragraphStyle}>
-            {about.description}
-        </p>
-    </>
-) : (
-    <p style={paragraphStyle}>
-        Loading about information...
-    </p>
-)}
+                            <p style={paragraphStyle}>
+                                {about.description}
+                            </p>
+                        </>
+                    ) : (
+                        <p style={paragraphStyle}>
+                            Loading about information...
+                        </p>
+                    )}
                 </div>
             </section>
 
-            {/* Skills */}
+            {/* =========================
+                SKILLS
+            ========================= */}
             <section
                 id="skills"
                 style={{
@@ -305,37 +412,45 @@ return (
                     textAlign: "center",
                 }}
             >
-                <h2 style={sectionTitleStyle}>My Skills</h2>
+                <h2 style={sectionTitleStyle}>
+                    My Skills
+                </h2>
 
                 <div
-    style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        gap: "20px",
-    }}
->
-    {skills.length > 0 ? (
-        skills.map((skill) => (
-            <div key={skill.id} style={skillStyle}>
-                {skill.name}
-            </div>
-        ))
-    ) : (
-        <p style={paragraphStyle}>
-            Loading skills...
-        </p>
-    )}
-</div>
+                    style={{
+                        maxWidth: "900px",
+                        margin: "0 auto",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        gap: "20px",
+                    }}
+                >
+                    {skills.length > 0 ? (
+                        skills.map((skill) => (
+                            <div
+                                key={skill.id}
+                                style={skillStyle}
+                            >
+                                {skill.name}
+                            </div>
+                        ))
+                    ) : (
+                        <p style={paragraphStyle}>
+                            Loading skills...
+                        </p>
+                    )}
+                </div>
             </section>
 
-            {/* Projects */}
+            {/* =========================
+                PROJECTS
+            ========================= */}
             <section
                 id="projects"
                 style={{
-                    background: "rgba(255, 255, 255, 0.75)",
+                    background:
+                        "rgba(255, 255, 255, 0.75)",
                     padding: "80px 20px",
                 }}
             >
@@ -358,58 +473,83 @@ return (
                         gap: "30px",
                     }}
                 >
-                  {projects.length > 0 ? (
-    projects.map((project) => (
-        <div key={project.id} style={projectCardStyle}>
-            <h3 style={projectTitleStyle}>
-                {project.title}
-            </h3>
+                    {projects.length > 0 ? (
+                        projects.map((project) => (
+                            <div
+                                key={project.id}
+                                style={projectCardStyle}
+                            >
+                                <h3
+                                    style={projectTitleStyle}
+                                >
+                                    {project.title}
+                                </h3>
 
-            <p style={projectDescriptionStyle}>
-                {project.description}
-            </p>
+                                <p
+                                    style={
+                                        projectDescriptionStyle
+                                    }
+                                >
+                                    {project.description}
+                                </p>
 
-            <p style={technologyStyle}>
-                <strong>Technologies:</strong>{" "}
-                {project.technologies}
-            </p>
+                                <p
+                                    style={
+                                        technologyStyle
+                                    }
+                                >
+                                    <strong>
+                                        Technologies:
+                                    </strong>{" "}
+                                    {project.technologies}
+                                </p>
 
-            {project.github_url && (
-                <a
-                    href={project.github_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={projectButtonStyle}
-                >
-                    GitHub
-                </a>
-            )}
+                                {project.github_url && (
+                                    <a
+                                        href={
+                                            project.github_url
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={
+                                            projectButtonStyle
+                                        }
+                                    >
+                                        GitHub
+                                    </a>
+                                )}
 
-            {project.live_url && (
-                <a
-                    href={project.live_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                        ...projectButtonStyle,
-                        marginLeft: "10px",
-                        marginTop: "10px",
-                    }}
-                >
-                    Live Demo
-                </a>
-            )}
-        </div>
-    ))
-) : (
-    <p style={paragraphStyle}>
-        Loading projects...
-    </p>
-)}  
+                                {project.live_url && (
+                                    <a
+                                        href={
+                                            project.live_url
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            ...projectButtonStyle,
+                                            marginLeft:
+                                                "10px",
+                                            marginTop:
+                                                "10px",
+                                        }}
+                                    >
+                                        Live Demo
+                                    </a>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p style={paragraphStyle}>
+                            Loading projects...
+                        </p>
+                    )}
                 </div>
             </section>
 
-            {/* Experience */}
+            {/* =========================
+                EXPERIENCE
+            ========================= */}
             <section
                 id="experience"
                 style={{
@@ -417,7 +557,9 @@ return (
                     textAlign: "center",
                 }}
             >
-                <h2 style={sectionTitleStyle}>Experience</h2>
+                <h2 style={sectionTitleStyle}>
+                    Experience
+                </h2>
 
                 <div
                     style={{
@@ -425,214 +567,95 @@ return (
                         margin: "40px auto 0",
                     }}
                 >
-                    {experience.length > 0 ? (
-    experience.map((item) => (
-        <div key={item.id} style={experienceCardStyle}>
-            <h3 style={experienceTitleStyle}>
-                {item.title}
-            </h3>
+                    {experienceLoading ? (
+                        <p style={paragraphStyle}>
+                            Loading experience...
+                        </p>
+                    ) : experienceError ? (
+                        <p
+                            style={{
+                                ...paragraphStyle,
+                                color: "#dc2626",
+                            }}
+                        >
+                            {experienceError}
+                        </p>
+                    ) : experience.length > 0 ? (
+                        experience.map((item) => (
+                            <div
+                                key={item.id}
+                                style={experienceCardStyle}
+                            >
+                                <h3
+                                    style={
+                                        experienceTitleStyle
+                                    }
+                                >
+                                    {item.title}
+                                </h3>
 
-            <h4 style={experienceCompanyStyle}>
-                {item.company}
-            </h4>
+                                <h4
+                                    style={
+                                        experienceCompanyStyle
+                                    }
+                                >
+                                    {item.company}
+                                </h4>
 
-            <p style={experienceDateStyle}>
-                {item.start_date} - {item.end_date || "Present"}
-            </p>
+                                <p
+                                    style={
+                                        experienceDateStyle
+                                    }
+                                >
+                                    {item.start_date
+                                        ? new Date(
+                                              item.start_date
+                                          ).toLocaleDateString(
+                                              "en-IN"
+                                          )
+                                        : ""}
+                                    {" - "}
+                                    {item.end_date
+                                        ? new Date(
+                                              item.end_date
+                                          ).toLocaleDateString(
+                                              "en-IN"
+                                          )
+                                        : "Present"}
+                                </p>
 
-            <p style={experienceDescriptionStyle}>
-                {item.description}
-            </p>
-        </div>
-    ))
-) : (
-    <p style={paragraphStyle}>
-        Loading experience...
-    </p>
-)}
+                                <p
+                                    style={
+                                        experienceDescriptionStyle
+                                    }
+                                >
+                                    {item.description}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <p style={paragraphStyle}>
+                            No experience added yet.
+                        </p>
+                    )}
                 </div>
             </section>
 
-            {/* Services */}
-<section
-    id="services"
-    style={{
-        background: "rgba(255, 255, 255, 0.75)",
-        padding: "80px 20px",
-        textAlign: "center",
-    }}
->
-    <h2 style={sectionTitleStyle}>My Services</h2>
-
-    <p
-        style={{
-            color: "#475569",
-            fontSize: "18px",
-            marginBottom: "40px",
-        }}
-    >
-        What I can build and help with
-    </p>
-
-    <div
-        style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "25px",
-        }}
-    >
-        {services.length > 0 ? (
-            services.map((service) => (
-                <div key={service.id} style={serviceCardStyle}>
-                    <div style={serviceIconStyle}>
-                        {service.icon || "💻"}
-                    </div>
-
-                    <h3 style={serviceTitleStyle}>
-                        {service.title}
-                    </h3>
-
-                    <p style={serviceDescriptionStyle}>
-                        {service.description}
-                    </p>
-                </div>
-            ))
-        ) : (
-            <p style={paragraphStyle}>
-                Loading services...
-            </p>
-        )}
-    </div>
-</section>
-
-{/* Testimonials */}
-
-{/* Testimonials */}
-<section
-    id="testimonials"
-    style={{
-        padding: "80px 20px",
-        textAlign: "center",
-    }}
->
-    <h2 style={sectionTitleStyle}>Testimonials</h2>
-
-    <p
-        style={{
-            color: "#475569",
-            fontSize: "18px",
-            marginBottom: "40px",
-        }}
-    >
-        What people say about my work
-    </p>
-
-    <div
-        style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "25px",
-        }}
-    >
-        {testimonials.length > 0 ? (
-            testimonials.map((testimonial) => (
-                <div
-                    key={testimonial.id}
-                    style={testimonialCardStyle}
-                >
-                    <p style={testimonialMessageStyle}>
-                        "{testimonial.message}"
-                    </p>
-
-                    <h3 style={testimonialNameStyle}>
-                        {testimonial.name}
-                    </h3>
-
-                    <p style={testimonialRoleStyle}>
-                        {testimonial.role}
-                    </p>
-                </div>
-            ))
-        ) : (
-            <p style={paragraphStyle}>
-                Loading testimonials...
-            </p>
-        )}
-    </div>
-</section>
-            {/* Blogs */}
-<section
-    id="blogs"
-    style={{
-        background: "rgba(255, 255, 255, 0.75)",
-        padding: "80px 20px",
-        textAlign: "center",
-    }}
->
-    <h2 style={sectionTitleStyle}>My Blogs</h2>
-
-    <p
-        style={{
-            color: "#475569",
-            fontSize: "18px",
-            marginBottom: "40px",
-        }}
-    >
-        Articles and things I have learned
-    </p>
-
-    <div
-        style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: "25px",
-        }}
-    >
-        {blogs.length > 0 ? (
-            blogs.map((blog) => (
-                <div
-                    key={blog.id}
-                    style={blogCardStyle}
-                >
-                    <h3 style={blogTitleStyle}>
-                        {blog.title}
-                    </h3>
-
-                    <p style={blogDescriptionStyle}>
-                        {blog.excerpt || blog.content}
-                    </p>
-
-                    <span style={blogTagStyle}>
-                        Blog
-                    </span>
-                </div>
-            ))
-        ) : (
-            <p style={paragraphStyle}>
-                Loading blogs...
-            </p>
-        )}
-    </div>
-</section>
-
-            {/* Contact */}
+            {/* =========================
+                SERVICES
+            ========================= */}
             <section
-                id="contact"
+                id="services"
                 style={{
+                    background:
+                        "rgba(255, 255, 255, 0.75)",
                     padding: "80px 20px",
                     textAlign: "center",
                 }}
             >
-                <h2 style={sectionTitleStyle}>Contact Me</h2>
+                <h2 style={sectionTitleStyle}>
+                    My Services
+                </h2>
 
                 <p
                     style={{
@@ -641,7 +664,230 @@ return (
                         marginBottom: "40px",
                     }}
                 >
-                    Have a project or opportunity? Let's connect.
+                    What I can build and help with
+                </p>
+
+                <div
+                    style={{
+                        maxWidth: "1100px",
+                        margin: "0 auto",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        gap: "25px",
+                    }}
+                >
+                    {services.length > 0 ? (
+                        services.map((service) => (
+                            <div
+                                key={service.id}
+                                style={serviceCardStyle}
+                            >
+                                <div
+                                    style={serviceIconStyle}
+                                >
+                                    {service.icon || "💻"}
+                                </div>
+
+                                <h3
+                                    style={
+                                        serviceTitleStyle
+                                    }
+                                >
+                                    {service.title}
+                                </h3>
+
+                                <p
+                                    style={
+                                        serviceDescriptionStyle
+                                    }
+                                >
+                                    {service.description}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <p style={paragraphStyle}>
+                            Loading services...
+                        </p>
+                    )}
+                </div>
+            </section>
+
+            {/* =========================
+                TESTIMONIALS
+            ========================= */}
+            <section
+                id="testimonials"
+                style={{
+                    padding: "80px 20px",
+                    textAlign: "center",
+                }}
+            >
+                <h2 style={sectionTitleStyle}>
+                    Testimonials
+                </h2>
+
+                <p
+                    style={{
+                        color: "#475569",
+                        fontSize: "18px",
+                        marginBottom: "40px",
+                    }}
+                >
+                    What people say about my work
+                </p>
+
+                <div
+                    style={{
+                        maxWidth: "1100px",
+                        margin: "0 auto",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        gap: "25px",
+                    }}
+                >
+                    {testimonials.length > 0 ? (
+                        testimonials.map(
+                            (testimonial) => (
+                                <div
+                                    key={testimonial.id}
+                                    style={
+                                        testimonialCardStyle
+                                    }
+                                >
+                                    <p
+                                        style={
+                                            testimonialMessageStyle
+                                        }
+                                    >
+                                        "
+                                        {
+                                            testimonial.message
+                                        }
+                                        "
+                                    </p>
+
+                                    <h3
+                                        style={
+                                            testimonialNameStyle
+                                        }
+                                    >
+                                        {testimonial.name}
+                                    </h3>
+
+                                    <p
+                                        style={
+                                            testimonialRoleStyle
+                                        }
+                                    >
+                                        {testimonial.role}
+                                    </p>
+                                </div>
+                            )
+                        )
+                    ) : (
+                        <p style={paragraphStyle}>
+                            Loading testimonials...
+                        </p>
+                    )}
+                </div>
+            </section>
+
+            {/* =========================
+                BLOGS
+            ========================= */}
+            <section
+                id="blogs"
+                style={{
+                    background:
+                        "rgba(255, 255, 255, 0.75)",
+                    padding: "80px 20px",
+                    textAlign: "center",
+                }}
+            >
+                <h2 style={sectionTitleStyle}>
+                    My Blogs
+                </h2>
+
+                <p
+                    style={{
+                        color: "#475569",
+                        fontSize: "18px",
+                        marginBottom: "40px",
+                    }}
+                >
+                    Articles and things I have learned
+                </p>
+
+                <div
+                    style={{
+                        maxWidth: "1100px",
+                        margin: "0 auto",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                        gap: "25px",
+                    }}
+                >
+                    {blogs.length > 0 ? (
+                        blogs.map((blog) => (
+                            <div
+                                key={blog.id}
+                                style={blogCardStyle}
+                            >
+                                <h3 style={blogTitleStyle}>
+                                    {blog.title}
+                                </h3>
+
+                                <p
+                                    style={
+                                        blogDescriptionStyle
+                                    }
+                                >
+                                    {blog.excerpt ||
+                                        blog.content}
+                                </p>
+
+                                <span
+                                    style={blogTagStyle}
+                                >
+                                    Blog
+                                </span>
+                            </div>
+                        ))
+                    ) : (
+                        <p style={paragraphStyle}>
+                            Loading blogs...
+                        </p>
+                    )}
+                </div>
+            </section>
+
+            {/* =========================
+                CONTACT
+            ========================= */}
+            <section
+                id="contact"
+                style={{
+                    padding: "80px 20px",
+                    textAlign: "center",
+                }}
+            >
+                <h2 style={sectionTitleStyle}>
+                    Contact Me
+                </h2>
+
+                <p
+                    style={{
+                        color: "#475569",
+                        fontSize: "18px",
+                        marginBottom: "40px",
+                    }}
+                >
+                    Have a project or opportunity? Let's
+                    connect.
                 </p>
 
                 <div style={contactContainerStyle}>
@@ -650,19 +896,19 @@ return (
                         onSubmit={handleContactSubmit}
                     >
                         <input
-                        type="text"
-                        placeholder="Your Name"
-                        value={formData.name}
-                        onChange={(event) =>
-                            setFormData({
-                                ...formData,
-                                name: event.target.value,
-                            })
-                        }
-                                style={inputStyle}
-                            />
+                            type="text"
+                            placeholder="Your Name"
+                            value={formData.name}
+                            onChange={(event) =>
+                                setFormData({
+                                    ...formData,
+                                    name: event.target.value,
+                                })
+                            }
+                            style={inputStyle}
+                        />
 
-                            <input
+                        <input
                             type="email"
                             placeholder="Your Email"
                             value={formData.email}
@@ -676,17 +922,18 @@ return (
                         />
 
                         <input
-                                type="text"
-                                placeholder="Subject"
-                                value={formData.subject}
-                                onChange={(event) =>
-                                    setFormData({
-                                        ...formData,
-                                        subject: event.target.value,
-                                    })
-                                }
-                                style={inputStyle}
-                            />
+                            type="text"
+                            placeholder="Subject"
+                            value={formData.subject}
+                            onChange={(event) =>
+                                setFormData({
+                                    ...formData,
+                                    subject:
+                                        event.target.value,
+                                })
+                            }
+                            style={inputStyle}
+                        />
 
                         <textarea
                             placeholder="Your Message"
@@ -695,40 +942,60 @@ return (
                             onChange={(event) =>
                                 setFormData({
                                     ...formData,
-                                    message: event.target.value,
+                                    message:
+                                        event.target.value,
                                 })
                             }
                             style={inputStyle}
                         ></textarea>
 
-                                    <button
-                        type="submit"
-                        style={contactButtonStyle}
-                    >
-                        Send Message
-                    </button>
-                     </form>
+                        <button
+                            type="submit"
+                            style={contactButtonStyle}
+                        >
+                            Send Message
+                        </button>
+
+                        {messageStatus && (
+                            <p
+                                style={{
+                                    marginTop: "15px",
+                                    color: "#475569",
+                                }}
+                            >
+                                {messageStatus}
+                            </p>
+                        )}
+                    </form>
 
                     <div style={contactInfoStyle}>
-                        <h3 style={contactInfoTitleStyle}>
+                        <h3
+                            style={contactInfoTitleStyle}
+                        >
                             Let's Connect
                         </h3>
 
                         <p>
-                            📧 Email: ira.jathe@example.com
+                            📧 Email:
+                            ira.jathe@example.com
                         </p>
 
                         <p>
-                            💻 GitHub: irajathe03-ij
+                            💻 GitHub:
+                            irajathe03-ij
                         </p>
 
                         <p>
-                            🔗 LinkedIn: Ira Jathe
+                            🔗 LinkedIn:
+                            Ira Jathe
                         </p>
                     </div>
                 </div>
             </section>
-                                {/* Footer */}
+
+            {/* =========================
+                FOOTER
+            ========================= */}
             <footer
                 style={{
                     background: "#312e81",
@@ -753,7 +1020,8 @@ return (
                         fontSize: "16px",
                     }}
                 >
-                    Computer Science Engineer | Full Stack Developer
+                    Computer Science Engineer | Full Stack
+                    Developer
                 </p>
 
                 <div
@@ -816,8 +1084,12 @@ return (
     );
 }
 
+/* =========================
+   STYLES
+========================= */
+
 const sectionTitleStyle = {
-fontSize: "clamp(30px, 7vw, 40px)",
+    fontSize: "clamp(30px, 7vw, 40px)",
     color: "#7c3aed",
     marginBottom: "30px",
 };
@@ -836,7 +1108,8 @@ const skillStyle = {
     color: "#7c3aed",
     fontSize: "17px",
     fontWeight: "bold",
-    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 5px 15px rgba(0, 0, 0, 0.08)",
     border: "1px solid #e9d5ff",
 };
 
@@ -855,7 +1128,8 @@ const projectCardStyle = {
     maxWidth: "420px",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
     boxSizing: "border-box",
 };
 
@@ -893,7 +1167,8 @@ const experienceCardStyle = {
     borderRadius: "20px",
     marginBottom: "25px",
     textAlign: "left",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
 };
 
 const experienceTitleStyle = {
@@ -924,7 +1199,8 @@ const serviceCardStyle = {
     maxWidth: "300px",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
     boxSizing: "border-box",
 };
 
@@ -951,7 +1227,8 @@ const testimonialCardStyle = {
     maxWidth: "300px",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
     boxSizing: "border-box",
 };
 
@@ -981,7 +1258,8 @@ const blogCardStyle = {
     maxWidth: "300px",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
     boxSizing: "border-box",
     textAlign: "left",
 };
@@ -1026,7 +1304,8 @@ const contactFormStyle = {
     maxWidth: "500px",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
     boxSizing: "border-box",
 };
 
@@ -1057,7 +1336,8 @@ const contactInfoStyle = {
     width: "300px",
     padding: "30px",
     borderRadius: "20px",
-    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.08)",
+    boxShadow:
+        "0 8px 25px rgba(0, 0, 0, 0.08)",
     boxSizing: "border-box",
     textAlign: "left",
     color: "#475569",
